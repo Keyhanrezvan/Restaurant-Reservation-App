@@ -23,18 +23,6 @@ function NewReservation() {
     history.goBack()
   }
 
-//   const submitHandler = async (e) => {
-//     e.preventDefault();
-
-//     let reservation = {...newRes}
-    
-//       createReservation(reservation)
-
-//       .then(()=>{history.push(`/dashboard?date=${newRes.reservation_date}`)})
-//     .catch (setError) 
-    
-//   };
-
 const submitHandler = (event) => {
     event.preventDefault();
     
