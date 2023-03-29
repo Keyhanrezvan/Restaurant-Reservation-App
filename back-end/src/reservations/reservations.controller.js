@@ -54,10 +54,10 @@ function validateFields(req, res, next) {
 }
 
 function notTuesday(req, res, next) {
-  const { reservation_date } = req.body.data;
-  const [year, month, day] = reservation_date.split("-");
-  const date = new Date(`${year}, ${month}, ${day}`);
-  res.locals.date = date;
+  const { reservation_date } = req.body.data
+  const [year, month, day] = reservation_date.split("-")
+  const date = new Date(`${year}, ${month}, ${day}`)
+  res.locals.date = date
   if (date.getUTCDay() === 2) {
     next({ status: 400, message: "closed" });
   }
@@ -70,6 +70,17 @@ function futureDay(req, res, next) {
     next({ status: 400, message: "Choose a future date" });
   }
   return next()
+}
+
+function timeFrame(req, res, next){
+const {reservation_time} = req.body.data
+const hours= Number(reservation_time.slice(0,2))
+const minutes= Number(reservation_time.slice(3,5))
+const time= hours * 100 + minutes
+if (time < 1030 || time > 2130){
+  next({status: 400, message: `Reservation is not allowed at selected time`})
+}
+return next()
 }
 
 async function reservationExists(req, res, next) {
@@ -104,16 +115,17 @@ async function create(req, res) {
 }
 
 module.exports = {
-  list,
+  list: [asyncErrorBoundary(list)],
   create: [
+    asyncErrorBoundary(validateFields),
+    timeFrame,
     notTuesday,
     futureDay,
-    asyncErrorBoundary(validateFields),
     asyncErrorBoundary(create),
   ],
   read: [
+    validateFields,
     asyncErrorBoundary(reservationExists),
-    asyncErrorBoundary(validateFields),
     asyncErrorBoundary(read),
   ],
 };

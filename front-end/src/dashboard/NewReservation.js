@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { createReservation } from "../utils/api.js";
-import ErrorAlert from "./ErrorAlert"
+import ErrorAlert from "../layout/ErrorAlert"
 
 function NewReservation() {
 
@@ -15,6 +15,7 @@ function NewReservation() {
     reservation_time: "",
     people: "",
   };
+  
   const [newRes, setNewRes] = useState({...formData});
   const [error, setError] =useState(null)
 
@@ -23,24 +24,16 @@ function NewReservation() {
     history.goBack()
   }
 
-const submitHandler = (event) => {
-    event.preventDefault();
-    
-    async function addData() {
-      try {
-        await createReservation({...newRes}); // :or brackets 
-        setNewRes(formData);
-      } catch (error) {
-        setError(error)
-      }
+const submitHandler = (e) => {
+    e.preventDefault();
+    setError(null)
+        createReservation({...newRes})
+        .then(() => {
+          history.push(`/dashboard?date=${newRes.reservation_date}`);
+        })
+       .catch(setError)
     }
-    addData()
-    history.push(`/dashboard?date=${newRes.reservation_date}`);
-
-    //  / saves new reservaton and displays /dashboard page for the date of the new reservation.
-    // / The /dashboard page will list all reservations for one date only.
-  };
-
+  
   const changeHandler = ({ target }) => {
     target.name === "people"? setNewRes({ ...newRes, [target.name]: Number(target.value)}):
     setNewRes({ ...newRes, [target.name]: target.value });
@@ -126,6 +119,6 @@ const submitHandler = (event) => {
       </form>
     </div>
   );
-}
+  }
 
 export default NewReservation;
