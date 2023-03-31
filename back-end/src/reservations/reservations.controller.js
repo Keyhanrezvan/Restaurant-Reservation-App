@@ -94,9 +94,10 @@ async function reservationExists(req, res, next) {
   }
   next({
     status: 404,
-    message: "Not a valid reservation",
+    message: "Reservation does not exist",
   });
 }
+
 
 async function read(req, res) {
   res.json({ data: res.locals.reservation });
