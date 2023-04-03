@@ -8,63 +8,31 @@ function validateFields(req, res, next) {
   const { data } = req.body;
   if (!data) {
     next({ status: 400, message: "No data entered" });
-  }
+  } 
   validFields.forEach((field) => {
     if (!data[field]) {
       return next({ status: 400, message: `Insert ${field} field` });
     }
   })
-}
-function validateCapacity(req, res, next){
-    const {capacity}=req.body.data
-  if (capacity > 0 && typeof capacity === "number"){
-    next()
-  } else {
-    next({status:400, message: 'Capacity must be whole number greater than 0'})
-  }
-}
-
-function validateName(req, res, next) {
-  const { table_name } = req.body.data;
-  if (table_name.length >= 2) {
-    next();
-  }
-  next({ status: 400, message: "Name needs to be atleast 2 letters" });
-}
-
-function lowCapacity() {
-  const { reservation, table} = res.locals
-  if (table.capacity <= reservation.people){
-    return next()
-  }
-next({status:400, message: "Capacity is less than reservation size"})
-}
-
-async function reservationExists(req, res, next) {
-    const { reservation_id } = req.params;
-  
-    const reservation = await service.readRes(reservation_id);
-  
-    if (reservation) {
-      res.locals.reservation = reservation;
-      return next();
-    }
-    next({
-      status: 404,
-      message: "Reservation does not exist",
+  if (typeof data["capacity"] !== "number") {
+    return next({
+      status: 400,
+      message: "capacity must be a number greater than 0",
     });
   }
 
-function tableStatus(req, res, next){
-    const {status} = res.locals.table
-
-    if (status === "occupied"){
-        next({status: 400, message: "table is occupied"})
-    }
+  if (data["table_name"].length < 2) {
+    return next({
+      status: 400,
+      message: "table_name must be at least two characters long.",
+    });
   }
 
+  next();
+}
 
 async function tableExists(req, res, next) {
+  
   const { table_id } = req.params
 
   const table = await service.read(table_id)
@@ -79,6 +47,59 @@ async function tableExists(req, res, next) {
   });
 }
 
+async function reservationExists(req, res, next) {
+  if (!req.body.data){
+    return next({status:400, message: "Insert table data"})
+  }
+  const { reservation_id } = req.body.data
+if (!reservation_id) {
+  return next({
+    status: 400,
+    message: `A reservation_id is required to seat table`,
+  })
+}
+  const reservation = await service.readRes(reservation_id);
+
+  if (!reservation) {
+    return next({
+      status: 404,
+      message: `${reservation_id} does not exist`
+    });
+  }
+  res.locals.reservation = reservation;
+  next()
+}
+
+function tableVacant(req, res, next) {
+
+
+  const table = res.locals.table;
+  if (table.reservation_id) {
+    return next({
+      status: 400,
+      message: `table_id '${table.table_id}' is occupied by reservation_id '${table.reservation_id}'.`,
+    });
+  }else{
+  next()
+}
+}
+
+// function lowCapacity() {
+//   const { reservation, table} = res.locals
+//   if (table.capacity < reservation.people){
+//     return next()
+//   }
+// next({status:400, message: "Capacity is less than reservation size"})
+// }
+
+// function tableStatus(req, res, next){
+//     const {status} = res.locals.table
+
+//     if (status === "occupied"){
+//         next({status: 400, message: "table is occupied"})
+//     }
+//   }
+
 async function list(req, res) {
   
   const list = await service.list();
@@ -91,12 +112,11 @@ async function read(req, res) {
 
 async function update(req, res, next){
 const updatedData = req.body.data
-
 const updatedTable= await service.update(updatedData)
 res.json({data: updatedTable})
 }
 
-async function create(req, res) {
+async function create(req, res, next) {
   const newTab = req.body.data;
   const createdTab = await service.create(newTab);
   res.status(201).json({ data: createdTab });
@@ -104,11 +124,11 @@ async function create(req, res) {
 
 module.exports = {
   list: [asyncErrorBoundary(list)],
-  create: [validateFields, validateName, validateCapacity, lowCapacity, asyncErrorBoundary(create)],
+  create: [validateFields, asyncErrorBoundary(create)],
   read: [
     validateFields,
     asyncErrorBoundary(tableExists),
     asyncErrorBoundary(read),
   ],
-  update: [validateFields, lowCapacity, asyncErrorBoundary(tableExists), asyncErrorBoundary(reservationExists), asyncErrorBoundary(update)]
+  update: [ asyncErrorBoundary(tableExists), tableVacant, asyncErrorBoundary(reservationExists), asyncErrorBoundary(update)]
 };

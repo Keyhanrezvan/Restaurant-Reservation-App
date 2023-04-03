@@ -10,8 +10,8 @@ function update(updatedData){
 
 function readRes(reservation_id){
     return knex("reservations")
-    .select("*")
     .where({reservation_id})
+    .select("*")
     .then(res=>res[0])
 }
 
