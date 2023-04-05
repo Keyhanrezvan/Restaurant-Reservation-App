@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert"
+import {createTable} from "../utils/api"
 
 function Tables() {
 
@@ -13,7 +14,11 @@ function Tables() {
   const submitHandler=(e)=>{
     e.preventDefault()
     setError(null)
-    
+    createTable({...tableInfo})
+    .then(()=>{
+      history.push("/dashboard")
+    })
+    .catch(setError)
   }
 
   const changeHandler=({target})=>{
@@ -51,6 +56,7 @@ setTableInfo({...tableInfo, [target.name]:(target.value)})
             value={tableInfo.capacity}
             onChange={changeHandler}
             placeholder="Capacity"
+            min="1"
           />
         </div>
         </form>
