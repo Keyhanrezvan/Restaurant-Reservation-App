@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { listReservations } from "../utils/api";
+import { listReservations, listTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { previous, next, today } from "../utils/date-time";
 import ReservationList from "./ReservationList";
+import TableList from "./TableList"
 import { useHistory } from "react-router";
 import "./Dashboard.css"
 
@@ -15,6 +16,7 @@ import "./Dashboard.css"
 function Dashboard({ date }) {
   const history = useHistory();
   const [reservations, setReservations] = useState([]);
+  const [tables, setTables] = useState([])
   const [reservationsError, setReservationsError] = useState(null);
 
   useEffect(() => {
@@ -23,6 +25,8 @@ function Dashboard({ date }) {
       setReservationsError(null);
       listReservations({ date }, abortController.signal)
         .then(setReservations)
+        .then(listTables)
+        .then(setTables)
         .catch(setReservationsError);
       return () => abortController.abort();
     }
@@ -58,7 +62,7 @@ function Dashboard({ date }) {
       </div>
       <div className="reservationList">
         <ReservationList reservation={reservations}/>
-        <TableList tables={tables}/>
+        <TableList tables={tables} key={tables.table_id}/>
     </div>
     </main>
   )

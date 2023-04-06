@@ -2,17 +2,14 @@ import React from "react";
 
 function ReservationList({reservation}){
 
-const handleSeat=(e)=>{
-
-}
 
     let bodyData = reservation.map((res) => {
         return (
             <tr className="">
-            <td>
+            <td className="content_td">
                 {res.first_name}
             </td>
-            <td>
+            <td className="content_td">
                 {res.last_name}
             </td>
             <td className="content_td">
@@ -29,7 +26,6 @@ const handleSeat=(e)=>{
             </td>
             <a
               href={`/reservations/${res.reservation_id}/seat`}
-              onClick={handleSeat}
               className='seatButton'>
               Seat
             </a>
