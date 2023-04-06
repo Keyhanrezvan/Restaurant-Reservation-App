@@ -57,6 +57,7 @@ setTableInfo({...tableInfo, [target.name]:(target.value)})
             onChange={changeHandler}
             placeholder="Capacity"
             min="1"
+            required
           />
         </div>
         </form>

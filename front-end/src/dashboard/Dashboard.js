@@ -51,17 +51,18 @@ function Dashboard({ date }) {
   return (
     <main>
       <h1>Dashboard</h1>
-      <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations for date</h4>
-      </div>
       <ErrorAlert error={reservationsError} />
       <div className="buttons">
       <button onClick={previousHelper}> Previous </button>
       <button onClick={todayHelper}> Today </button>
       <button onClick={nextHelper}> Next </button>
       </div>
+      <br/>
       <div className="reservationList">
+      <h4 className="mb-0">Reservations for date</h4>
         <ReservationList reservation={reservations}/>
+        <br/>
+      <h4 className="mb-0">Tables</h4>
         <TableList tables={tables} key={tables.table_id}/>
     </div>
     </main>

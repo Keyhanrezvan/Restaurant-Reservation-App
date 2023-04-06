@@ -2,17 +2,17 @@ import React from "react";
 
 function TableList({tables, key}){
 
-    let bodyData = tables.map((tab) => {
+    let bodyData = tables.map((table) => {
         return (
             <tr className="" key={key}>
             <td className="content_td">
-                {tab.table_name}
+                {table.table_name}
             </td>
             <td className="content_td">
-                {tab.capacity}
+                {table.capacity}
             </td>
-            <td data-table-id-status={tab.table_id} >
-               {tab.status}
+            <td data-table-id-status={table.table_id} >
+               {table.status}
             </td>
         </tr>
         )
