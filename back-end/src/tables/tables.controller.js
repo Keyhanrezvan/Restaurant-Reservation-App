@@ -111,7 +111,7 @@ async function read(req, res) {
   }
 
 async function update(req, res, next){
-const updatedData = req.body.data
+const updatedData = {...req.body.data, table_id: res.locals.table.table_id}
 const updatedTable= await service.update(updatedData)
 res.json({data: updatedTable})
 }
