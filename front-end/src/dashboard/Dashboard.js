@@ -19,19 +19,18 @@ function Dashboard({ date }) {
   const [tables, setTables] = useState([])
   const [reservationsError, setReservationsError] = useState(null);
 
-  useEffect(() => {
-    function loadDashboard() {
-      const abortController = new AbortController();
-      setReservationsError(null);
-      listReservations({ date }, abortController.signal)
-        .then(setReservations)
-        .then(listTables)
-        .then(setTables)
-        .catch(setReservationsError);
-      return () => abortController.abort();
-    }
-    loadDashboard();
-  }, [date]);
+  useEffect(loadDashboard, [date]);
+
+  function loadDashboard() {
+    const abortController = new AbortController();
+    setReservationsError(null);
+    listReservations({ date }, abortController.signal)
+      .then(setReservations)
+      .then(listTables)
+      .then(setTables)
+      .catch(setReservationsError);
+    return () => abortController.abort();
+  }
 
   function nextHelper() {
     const nextDate = next(date);
@@ -63,7 +62,7 @@ function Dashboard({ date }) {
         <ReservationList reservation={reservations}/>
         <br/>
       <h4 className="mb-0">Tables</h4>
-        <TableList tables={tables} key={tables.table_id}/>
+        <TableList tables={tables} loadDash={loadDashboard}/>
     </div>
     </main>
   )

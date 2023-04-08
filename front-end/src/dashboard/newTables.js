@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert"
 import {createTable} from "../utils/api"
 
-function Tables() {
+function newTables() {
 
   const history = useHistory()
 
@@ -67,4 +67,4 @@ setTableInfo({...tableInfo, [target.name]:(target.value)})
   )
 }
 
-export default Tables;
+export default newTables;

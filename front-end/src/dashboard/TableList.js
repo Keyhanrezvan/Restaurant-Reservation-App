@@ -1,24 +1,17 @@
 import React from "react";
 
-function TableList({tables, key}){
+function TableList({tables, loadDash}){
+
+  if (!tables) {
+    return null;
+  }
 
     let bodyData = tables.map((table) => {
         return (
-            <tr className="" key={key}>
-            <td className="content_td">
-                {table.table_name}
-            </td>
-            <td className="content_td">
-                {table.capacity}
-            </td>
-            <td data-table-id-status={table.table_id} >
-               {table.status}
-            </td>
-        </tr>
+            <tableData key={table.table_id} table={table} loadDashboard={loadDash}/>
         )
         })
-  
-  
+
     return (
       <div className="res-list">
         <table>

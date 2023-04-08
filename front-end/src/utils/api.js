@@ -102,6 +102,46 @@ export async function listReservations(params, signal) {
     .then(formatReservationTime);
 }
 
+/** PUT an update to a reservation's status in the database
+ *
+ * @param data
+ * the data to update the reservation's status
+ * @param reservationId
+ *  the id of the desired reservation
+ * @param signal
+ *  optional AbortController.signal
+ * @returns {Promise<reservation>}
+ *  a promise that resolves the saved reservation
+ */
+export async function updateReservationStatus(data, reservation_id, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+
+/** DELETE request to remove reservation_id from a table
+ *
+ * @param table_id
+ * the id of the specified table
+ * @param signal
+ * optional AbortController.signal
+ */
+export async function deleteReservationId(table_id, signal) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  const options = {
+    method: "DELETE",
+    headers,
+    body: JSON.stringify({ data: { table_id } }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+
 export async function listTables(signal) {
   const url = new URL(`${API_BASE_URL}/tables`);
   return await fetchJson(url, { headers, signal }, []);
