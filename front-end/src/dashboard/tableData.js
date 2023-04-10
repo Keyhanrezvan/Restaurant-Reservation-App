@@ -2,7 +2,7 @@ import React from "react";
 import { useHistory } from "react-router";
 import { deleteReservationId } from "../utils/api";
 
-function tableData({ table, loadDashboard }) {
+function TableData({ key, table, loadDashboard }) {
   const history = useHistory();
 
   const status = table.reservation_id ? "Occupied" : "Free";
@@ -22,13 +22,12 @@ function tableData({ table, loadDashboard }) {
   }
 
   return (
-    <div>
+    <>
       <tr className="" key={key}>
         <td className="content_td">{table.table_name}</td>
         <td className="content_td">{table.capacity}</td>
         <td data-table-id-status={table.table_id}>{status}</td>
         {status === "Occupied" && (
-          <td>
             <button
               data-table-id-finish={table.table_id}
               type="button"
@@ -37,11 +36,10 @@ function tableData({ table, loadDashboard }) {
             >
               Finish
             </button>
-          </td>
         )}
       </tr>
-    </div>
+    </>
   );
 }
 
-export default tableData;
+export default TableData;
