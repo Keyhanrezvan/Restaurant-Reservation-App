@@ -6,10 +6,10 @@ function TableList({tables, loadDash}){
   if (!tables) {
     return null;
   }
-console.log(tables)
-    let bodyData = tables.map((table, index) => {
+
+    let bodyData = tables.map((table) => {
         return (
-            <TableData key={index} table={table} loadDashboard={loadDash}/>
+            <TableData key={table.table_id} table={table} loadDashboard={loadDash}/>
         )
         })
 
