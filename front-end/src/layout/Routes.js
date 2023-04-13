@@ -6,7 +6,7 @@ import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
 import useQuery from "../utils/useQuery";
 import NewReservation from "../dashboard/NewReservation";
-import NewTables from "../dashboard/NewTables";
+import NewTables from "../dashboard/ABC123Tables";
 import Seat from "../dashboard/Seat";
 import Search from "../dashboard/Search";
 import EditReservation from "../dashboard/EditReservation";
