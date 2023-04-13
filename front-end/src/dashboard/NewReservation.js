@@ -1,124 +1,60 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
-import { createReservation } from "../utils/api.js";
-import ErrorAlert from "../layout/ErrorAlert"
+import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { createReservation } from '../utils/api';
+import ErrorAlert from '../layout/ErrorAlert';
+import ReservationForm from './ReservationForm';
 
-function NewReservation() {
 
+const NewReservation = () => {
+  //useHistory hook
   const history = useHistory();
 
-  const formData = {
-    first_name: "",
-    last_name: "",
-    mobile_number: "",
-    reservation_date: "",
-    reservation_time: "",
-    people: "",
+  //form data default
+  const initialFormData = {
+    first_name: '',
+    last_name: '',
+    mobile_number: '',
+    reservation_date: '',
+    reservation_time: '',
+    people: '',
   };
-  
-  const [newRes, setNewRes] = useState({...formData});
-  const [error, setError] =useState(null)
 
-  const cancelHandler= (e)=>{
-    e.preventDefault()
-    history.goBack()
-  }
+  //state variables
+  const [formData, setFormData] = useState(initialFormData);
+  const [error, setError] = useState(null);
 
-const submitHandler = (e) => {
+  //event and click handlers
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError(null)
-        createReservation({...newRes})
-        .then(() => {
-          history.push(`/dashboard?date=${newRes.reservation_date}`);
-        })
-       .catch(setError)
-    }
-  
-  const changeHandler = ({ target }) => {
-    target.name === "people"? setNewRes({ ...newRes, [target.name]: Number(target.value)}):
-    setNewRes({ ...newRes, [target.name]: target.value });
+    setError(null);
+    const reservation = {
+      ...formData,
+      status: 'booked',
+    };
+    createReservation(reservation)
+      .then(() => {
+        history.push(`/dashboard?date=${formData.reservation_date}`);
+      })
+      .catch(setError);
   };
 
+  //main render
   return (
     <div>
-        <ErrorAlert error={error}/>
-      <form onSubmit={submitHandler}>
-        <div className="formGroup">
-          <label>First Name</label>
-          <input
-            type="text"
-            id="first_name"
-            name="first_name"
-            value={newRes.first_name}
-            onChange={changeHandler}
-            placeholder="First Name"
-          />
-        </div>
-        <div className="formGroup">
-          <label>Last Name</label>
-          <input
-            type="text"
-            id="last_name"
-            name="last_name"
-            value={newRes.last_name}
-            onChange={changeHandler}
-            placeholder="Last Name"
-          />
-        </div>
-        <div className="formGroup">
-          <label>Mobile_Number</label>
-          <input
-            type="text"
-            id="mobile_number"
-            name="mobile_number"
-            value={newRes.mobile_number}
-            onChange={changeHandler}
-            placeholder="***-***-****"
-          />
-        </div>
-        <div className="formGroup">
-          <label>Date of Reservation</label>
-          <input
-            type="date"
-            id="reservation_date"
-            name="reservation_date"
-            value={newRes.reservation_date}
-            onChange={changeHandler}
-            placeholder="Date"
-          />
-        </div>
-        <div className="formGroup">
-          <label>Time of Reservation</label>
-          <input
-            type="time"
-            id="reservation_time"
-            name="reservation_time"
-            value={newRes.reservation_time}
-            onChange={changeHandler}
-            placeholder="Time"
-          />
-        </div>
-        <div className="formGroup">
-          <label>Party Size</label>
-          <input
-            type="number"
-            id="people"
-            name="people"
-            value={newRes.people}
-            onChange={changeHandler}
-            placeholder="#"
-            min="1"
-          />
-        </div>
-        <div className="buttonGroup">
-          <button className="cancelButton" onClick={cancelHandler}>Cancel</button>
-          <button className="submitButton" type="submit" >
-            Submit
-          </button>
-        </div>
-      </form>
+      <ErrorAlert error={error} />
+      <h3 className='d-flex m-3 justify-content-center newreservation__header-text'>
+        New Reservation Form
+      </h3>
+
+      <div>
+        <ReservationForm
+          formData={formData}
+          setFormData={setFormData}
+          handleSubmit={handleSubmit}
+        />
+      </div>
     </div>
   );
-  }
+};
 
 export default NewReservation;

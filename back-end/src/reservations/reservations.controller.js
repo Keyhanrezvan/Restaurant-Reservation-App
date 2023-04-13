@@ -109,6 +109,13 @@ async function list(req, res) {
   res.json({ data: list });
 }
 
+async function update(req, res) {
+  const updatedReservation = { ...req.body.data };
+  const { reservationId } = req.params;
+  const data = await service.update(reservationId, updatedReservation);
+  res.status(200).json({ data });
+}
+
 async function create(req, res) {
   const newRes = req.body.data;
   const createdRes = await service.create(newRes);
@@ -129,4 +136,11 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(read),
   ],
+  update: [
+    asyncErrorBoundary(validateFields),
+    timeFrame,
+    notTuesday,
+    futureDay,
+    asyncErrorBoundary(update)
+  ]
 };

@@ -52,6 +52,16 @@ async function fetchJson(url, options, onCancel) {
   }
 }
 // saves reservation to the database
+export async function updateReservationStatus(data, reservation_id, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
 
 export async function createReservation(reservation, signal) { 
   const url = `${API_BASE_URL}/reservations`;
@@ -113,16 +123,6 @@ export async function listReservations(params, signal) {
  * @returns {Promise<reservation>}
  *  a promise that resolves the saved reservation
  */
-export async function updateReservationStatus(data, reservation_id, signal) {
-  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
-  const options = {
-    method: "PUT",
-    headers,
-    body: JSON.stringify({ data }),
-    signal,
-  };
-  return await fetchJson(url, options);
-}
 
 /** DELETE request to remove reservation_id from a table
  *
