@@ -3,8 +3,10 @@ import { useHistory } from "react-router";
 import { createTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function Tables() {
+export default function NewTables() {
+
   const history = useHistory();
+
   const initForm = { table_name: "", capacity: 0 };
   const [tableError, setTableError] = useState(null);
   const [tableForm, setTableForm] = useState({ ...initForm });
@@ -38,7 +40,7 @@ export default function Tables() {
   return (
     <>
       <div className="d-flex justify-content-center pt-3">
-        <h3>Create a New Table</h3>
+        <h3>Create Table</h3>
       </div>
       <ErrorAlert error={tableError} />
       <form onSubmit={handleSubmit}>
@@ -65,12 +67,12 @@ export default function Tables() {
           required
         />
         <div className="d-flex justify-content-center">
-          <button type="submit" className="btn btn-primary mr-1">
+          <button type="submit" className="btn btn-outline-primary mr-1">
             Submit
           </button>
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-outline-secondary"
             onClick={handleCancel}
           >
             Cancel

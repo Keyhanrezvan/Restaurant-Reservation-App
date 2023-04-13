@@ -14,8 +14,8 @@ export default function TableList({ tables, loadDashboard }) {
 
   return (
     <div>
-      <table className="table table-sm table-striped table-bordered">
-        <thead>
+      <table className="table table-sm table-hover table-bordered">
+        <thead class="table-primary">
           <tr>
             <th scope="col">#</th>
             <th scope="col">Table</th>

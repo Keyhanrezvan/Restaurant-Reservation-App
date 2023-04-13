@@ -5,7 +5,7 @@ import { findReservation, modifyReservation } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import ReservationForm from "./ReservationForm";
 
-export default function Edit() {
+export default function EditReservation() {
   const history = useHistory();
   const { reservation_id } = useParams();
   const [error, setError] = useState(null);
@@ -28,7 +28,7 @@ export default function Edit() {
   const findErrors = (res, errors) => {
     isNotOnTuesday(res.reservation_date, errors);
     isInTheFuture(res.reservation_date, errors);
-    //in-line validation to ensure reservation can be modified
+  
     if (res.status && res.status !== "booked") {
       errors.push(
         <li key="not booked">Reservation can no longer be changed</li>

@@ -6,7 +6,7 @@ import { isInTheFuture } from "../utils/date-time";
 import ErrorAlert from "../layout/ErrorAlert";
 import ReservationForm from "./ReservationForm";
 
-export default function Reservations() {
+export default function NewReservations() {
   const history = useHistory();
   const [reservationsError, setReservationsError] = useState(null);
   const initialFormData = {

@@ -1,7 +1,7 @@
 import React from "react";
 import FinishButton from "./FinishButton";
 
-export default function TableInfo({ table, loadDashboard }) {
+export default function TableData({ table, loadDashboard }) {
   const status = table.reservation_id ? "Occupied" : "Free";
   return (
     <>

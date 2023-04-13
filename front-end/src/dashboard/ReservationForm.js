@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router";
 
-export default function Form({
+export default function ReservationForm({
   initialformData,
   handleFormChange,
   handleSubmit,
@@ -17,7 +17,7 @@ export default function Form({
       <form onSubmit={handleSubmit} className="form-group">
         <fieldset>
           <legend className="d-flex justify-content-center">
-            Guest Information
+           Reservation Information
           </legend>
           <div className="pb-1">
             <input
@@ -91,12 +91,12 @@ export default function Form({
           />
         </fieldset>
         <div className="d-flex justify-content-center pt-2">
-          <button type="submit" className="btn btn-primary mr-1">
+          <button type="submit" className="btn btn-outline-primary mr-1">
             Submit
           </button>
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-outline-secondary"
             onClick={handleCancel}
           >
             Cancel

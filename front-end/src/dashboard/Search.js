@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { listReservations } from "../utils/api";
-import ReservationTable from "./ReservationList";
+import ReservationList from "./ReservationList";
 import ErrorAlert from "../layout/ErrorAlert";
 
 export default function Search() {
@@ -47,7 +47,7 @@ export default function Search() {
             required
           />
           <div className="pt-2">
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-outline-primary">
               Find
             </button>
           </div>
@@ -56,7 +56,7 @@ export default function Search() {
       {display && (
         <div>
           {reservations.length ? (
-            <ReservationTable
+            <ReservationList
               reservations={reservations}
               setReservations={setReservations}
               setError={setError}

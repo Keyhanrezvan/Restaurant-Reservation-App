@@ -4,8 +4,11 @@ import { listTables, seatReservation } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
 export default function Seat() {
+
   const { reservation_id } = useParams();
+
   const history = useHistory();
+  
   const [error, setError] = useState(null);
   const [tables, setTables] = useState([]);
   const [seatTable, setSeatTable] = useState(null);

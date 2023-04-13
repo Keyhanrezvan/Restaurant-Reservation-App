@@ -3,7 +3,7 @@ import ReservationData from "./ReservationData";
 import { cancelReservation } from "../utils/api";
 import { useHistory } from "react-router-dom";
 
-export default function ReservationTable({
+export default function ReservationList({
   reservations,
   setReservations,
   setError,
@@ -41,8 +41,8 @@ export default function ReservationTable({
 
   return (
     <>
-      <table className="table table-sm table-striped table-bordered">
-        <thead>
+      <table className="table table-sm table-hover table-bordered">
+        <thead class="table-primary">
           <tr>
             <th scope="col">#</th>
             <th scope="col">First</th>
