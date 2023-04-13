@@ -1,5 +1,5 @@
 import React from "react";
-import TableData from "./ABC";
+import TableData from "./TableData";
 
 export default function TableList({ tables, loadDashboard }) {
   if (!tables) {
