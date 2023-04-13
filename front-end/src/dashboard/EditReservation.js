@@ -1,85 +1,75 @@
-import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import { listReservations, updateReservation } from '../utils/api';
-import ErrorAlert from './ErrorAlert';
-import ReservationForm from './ReservationForm';
-import './EditReservation.css';
+import React, { useState, useEffect } from "react";
+import { useHistory, useParams } from "react-router";
+import { isNotOnTuesday, isInTheFuture } from "../utils/date-time";
+import { findReservation, modifyReservation } from "../utils/api";
+import ErrorAlert from "../layout/ErrorAlert";
+import ReservationForm from "./ReservationForm";
 
-const EditReservation = () => {
-  
+export default function Edit() {
   const history = useHistory();
-  const params = useParams();
-
-  
-  const initialFormData = {
-    first_name: '',
-    last_name: '',
-    mobile_number: '',
-    reservation_date: '',
-    reservation_time: '',
-    people: '',
-    status: 'booked',
-  };
-
- 
-  const [formData, setFormData] = useState(initialFormData);
+  const { reservation_id } = useParams();
   const [error, setError] = useState(null);
-  const [reservations, setReservations] = useState([]);
-  const [currentReservation, setCurrentReservation] = useState({});
-
-  
-  useEffect(() => {
-    const abortController = new AbortController();
-    setError(null);
-    listReservations({})
-      .then((response) => {
-        setReservations(response);
-      })
-      .catch(setError);
-    return () => abortController.abort();
-  }, []);
+  const [reservationData, setReservationData] = useState(null);
 
   useEffect(() => {
-    if (reservations.length !== 0) {
-      const current = reservations.find(
-        (res) => res.reservation_id === Number(params.reservation_id)
-      );
-      setCurrentReservation(current);
-      setFormData(current);
+    async function loadReservation() {
+      const ac = new AbortController();
+      try {
+        const reservation = await findReservation(reservation_id, ac.signal);
+        setReservationData(reservation);
+      } catch (error) {
+        setError(error);
+      }
+      return () => ac.abort();
     }
-  }, [reservations, params]);
+    loadReservation();
+  }, [reservation_id]);
 
- 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError(null);
-    const updatedReservation = {
-      ...formData,
-    };
-    updateReservation(updatedReservation, currentReservation.reservation_id)
-      .then(() => {
-        history.push(`/dashboard?date=${formData.reservation_date}`);
-      })
-      .catch(setError);
+  const findErrors = (res, errors) => {
+    isNotOnTuesday(res.reservation_date, errors);
+    isInTheFuture(res.reservation_date, errors);
+    //in-line validation to ensure reservation can be modified
+    if (res.status && res.status !== "booked") {
+      errors.push(
+        <li key="not booked">Reservation can no longer be changed</li>
+      );
+    }
   };
 
- 
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const ac = new AbortController();
+    const errors = [];
+    findErrors(reservationData, errors);
+    if (errors.length) {
+      setError({ message: errors });
+      return;
+    }
+    try {
+      reservationData.people = Number(reservationData.people);
+      await modifyReservation(reservation_id, reservationData, ac.signal);
+      history.push(`/dashboard?date=${reservationData.reservation_date}`);
+    } catch (error) {
+      setError(error);
+    }
+    return () => ac.abort();
+  }
+
+  const handleFormChange = (e) => {
+    setReservationData({
+      ...reservationData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
-    <div>
+    <>
       <ErrorAlert error={error} />
-      <h3 className='d-flex m-3 justify-content-center editreservation__header-text'>
-        Edit Reservation Form
-      </h3>
-
-      <div>
-        <ReservationForm
-          formData={formData}
-          setFormData={setFormData}
-          handleSubmit={handleSubmit}
-        />
-      </div>
-    </div>
+      <ReservationForm
+        initialformData={reservationData}
+        handleFormChange={handleFormChange}
+        handleSubmit={handleSubmit}
+      />
+    </>
   );
-};
-
-export default EditReservation;
+}

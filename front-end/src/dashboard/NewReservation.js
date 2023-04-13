@@ -1,60 +1,65 @@
-import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { createReservation } from '../utils/api';
-import ErrorAlert from '../layout/ErrorAlert';
-import ReservationForm from './ReservationForm';
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { createReservation } from "../utils/api";
+import { isNotOnTuesday } from "../utils/date-time";
+import { isInTheFuture } from "../utils/date-time";
+import ErrorAlert from "../layout/ErrorAlert";
+import ReservationForm from "./ReservationForm";
 
-
-const NewReservation = () => {
-  //useHistory hook
+export default function Reservations() {
   const history = useHistory();
-
-  //form data default
+  const [reservationsError, setReservationsError] = useState(null);
   const initialFormData = {
-    first_name: '',
-    last_name: '',
-    mobile_number: '',
-    reservation_date: '',
-    reservation_time: '',
-    people: '',
+    first_name: "",
+    last_name: "",
+    mobile_number: "",
+    reservation_date: "",
+    reservation_time: "",
+    people: 0,
   };
 
-  //state variables
-  const [formData, setFormData] = useState(initialFormData);
-  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({ ...initialFormData });
 
-  //event and click handlers
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError(null);
-    const reservation = {
+  const handleFormChange = (e) => {
+    setFormData({
       ...formData,
-      status: 'booked',
-    };
-    createReservation(reservation)
-      .then(() => {
-        history.push(`/dashboard?date=${formData.reservation_date}`);
-      })
-      .catch(setError);
+      [e.target.name]: e.target.value,
+    });
   };
 
-  //main render
+  const findErrors = (date, errors) => {
+    isNotOnTuesday(date, errors);
+    isInTheFuture(date, errors);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const controller = new AbortController();
+    const errors = [];
+    findErrors(formData.reservation_date, errors);
+    if (errors.length) {
+      setReservationsError({ message: errors });
+      return;
+    }
+    try {
+      formData.people = Number(formData.people);
+      await createReservation(formData, controller.signal);
+      const date = formData.reservation_date;
+      history.push(`/dashboard?date=${date}`);
+    } catch (error) {
+      setReservationsError(error);
+    }
+    return () => controller.abort();
+  };
+
   return (
-    <div>
-      <ErrorAlert error={error} />
-      <h3 className='d-flex m-3 justify-content-center newreservation__header-text'>
-        New Reservation Form
-      </h3>
-
-      <div>
-        <ReservationForm
-          formData={formData}
-          setFormData={setFormData}
-          handleSubmit={handleSubmit}
-        />
-      </div>
-    </div>
+    <>
+      <ErrorAlert error={reservationsError} />
+      <ReservationForm
+        initialformData={formData}
+        handleFormChange={handleFormChange}
+        handleSubmit={handleSubmit}
+      />
+    </>
   );
-};
-
-export default NewReservation;
+}

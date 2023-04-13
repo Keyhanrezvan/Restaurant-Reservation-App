@@ -1,73 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import { listReservations } from '../utils/api';
-import ReservationList from './ReservationList';
+import React, { useState } from "react";
+import { listReservations } from "../utils/api";
+import ReservationTable from "./ReservationList";
+import ErrorAlert from "../layout/ErrorAlert";
 
+export default function Search() {
+  const [reservations, setReservations] = useState([]);
+  const [display, setDisplay] = useState(false);
+  const [mobile, setMobile] = useState("");
+  const [error, setError] = useState(null);
 
-const Search = () => {
-  //state variables
-  const [showError, setShowError] = useState(false);
-  const [reservations, setReservations] = useState(null);
-  const [mobile_number, setMobile_number] = useState('');
+  function changeHandler(e) {
+    setMobile(e.target.value);
+  }
 
-  //useEffect section
-  useEffect(() => {
-    if (reservations && reservations.length === 0) {
-      setShowError(true);
-    }
-  }, [reservations]);
-
-  //event and click handlers
-  const handleSubmit = (e) => {
+  async function searchHandler(e) {
     e.preventDefault();
-    listReservations({ mobile_number }).then((response) => {
-      setReservations(response);
-    });
-  };
+    const ac = new AbortController();
+    try {
+      const reservations = await listReservations(
+        { mobile_number: mobile },
+        ac.signal
+      );
+      setReservations(reservations);
+      setDisplay(true);
+    } catch (error) {
+      setError(error);
+    }
+    return () => ac.abort();
+  }
 
-  //main render
   return (
-    <div>
-      <div>
-        {showError && (
-          <p className='alert alert-danger'>No reservations found.</p>
-        )}
+    <>
+      <div className="d-flex justify-content-center pt-3">
+        <h3>Search</h3>
       </div>
-
-      <h3 className='d-flex m-3 justify-content-center search__header-text'>
-        Search Form
-      </h3>
-
-      <div>
-        <form className='search__text form-group' onSubmit={handleSubmit}>
+      <ErrorAlert error={error} />
+      <div className="pt-3 pb-3">
+        <form className="form-group" onSubmit={searchHandler}>
           <input
-            name='mobile_number'
-            type='text'
+            name="mobile_number"
+            id="mobile_number"
+            onChange={changeHandler}
             placeholder="Enter a customer's phone number"
+            value={mobile}
+            className="form-control"
             required
-            onChange={(e) => setMobile_number(e.target.value)}
-            value={mobile_number}
-            className='form-control'
           />
-          <br />
-          <div className='d-flex justify-content-center'>
-            <button className='search__btn--find' type='submit'>
+          <div className="pt-2">
+            <button type="submit" className="btn btn-primary">
               Find
             </button>
           </div>
         </form>
-        <div>
-          <ul className='list-group list-group-flush'>
-            {reservations &&
-              reservations.map((res) => (
-                <li className='list-group-item' key={res.reservation_id}>
-                  <ReservationList reservation={res} />
-                </li>
-              ))}
-          </ul>
-        </div>
       </div>
-    </div>
+      {display && (
+        <div>
+          {reservations.length ? (
+            <ReservationTable
+              reservations={reservations}
+              setReservations={setReservations}
+              setError={setError}
+            />
+          ) : (
+            <h3>No reservations found</h3>
+          )}
+        </div>
+      )}
+    </>
   );
-};
-
-export default Search;
+}

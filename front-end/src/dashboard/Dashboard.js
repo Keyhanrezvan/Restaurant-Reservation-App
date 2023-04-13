@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
+import ReservationList from ".//ReservationList";
 import { listReservations, listTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
-import { previous, next, today } from "../utils/date-time";
-import ReservationList from "./ReservationList";
-import TableList from "./TableList"
-import { useHistory } from "react-router";
-import "./Dashboard.css"
+import { useHistory } from "react-router-dom";
+import { previous, next } from "../utils/date-time";
+import TableList from "./TableList";
 
 /**
  * Defines the dashboard page.
@@ -14,10 +13,10 @@ import "./Dashboard.css"
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
-  const history = useHistory();
   const [reservations, setReservations] = useState([]);
-  const [tables, setTables] = useState([])
+  const [tables, setTables] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
+  const history = useHistory();
 
   useEffect(loadDashboard, [date]);
 
@@ -32,42 +31,47 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
-  function nextHelper() {
-    const nextDate = next(date);
-    history.push(`/dashboard?date=${nextDate}`);
+  function handleToday() {
+    history.push(`/dashboard`);
   }
 
-  function previousHelper() {
-    const previousDate = previous(date);
-    history.push(`/dashboard?date=${previousDate}`);
+  function handlePrev() {
+    const newDate = previous(date);
+    history.push(`/dashboard?date=${newDate}`);
   }
 
-  function todayHelper() {
-    const todayDate = today(date);
-    history.push(`/dashboard?date=${todayDate}`);
+  function handleNext() {
+    history.push(`/dashboard?date=${next(date)}`);
   }
 
   return (
     <main>
-      <h1>Dashboard</h1>
-      <ErrorAlert error={reservationsError} />
-      <div className="buttons">
-      <button onClick={previousHelper}> Previous </button>
-      <button onClick={todayHelper}> Today </button>
-      <button onClick={nextHelper}> Next </button>
+      <h1 className="d-md-flex justify-content-center">Dashboard</h1>
+      <div className="d-md-flex mb-3 justify-content-center">
+        <h4 className="mb-0">Reservations for {date}</h4>
       </div>
-      <br/>
-      <div className="reservationList">
-      <h4 className="mb-0">Reservations for date</h4>
-        <ReservationList reservation={reservations}/>
-        <br/>
-      <h4 className="mb-0">Tables</h4>
-        <TableList tables={tables} loadDash={loadDashboard}/>
-    </div>
+      <div className="pb-2 d-flex justify-content-center">
+        <button className="btn btn-primary mr-1" onClick={handleToday}>
+          today
+        </button>
+        <button className="btn btn-primary mr-1" onClick={handlePrev}>
+          previous
+        </button>
+        <button className="btn btn-primary" onClick={handleNext}>
+          next
+        </button>
+      </div>
+      <ErrorAlert error={reservationsError} />
+      <ReservationList
+        reservations={reservations}
+        setReservations={setReservations}
+        setError={setReservationsError}
+      />
+      <div>
+        <TableList tables={tables} loadDashboard={loadDashboard} />
+      </div>
     </main>
-  )
-
-
+  );
 }
 
 export default Dashboard;

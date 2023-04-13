@@ -1,45 +1,54 @@
 import React, { useState, useEffect } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router";
+import { listTables, seatReservation } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
-import { listTables, seatReservationUpdate } from "../utils/api";
 
-function Seat() {
+export default function Seat() {
+  const { reservation_id } = useParams();
   const history = useHistory();
-const {reservation_id}= useParams()
-
   const [error, setError] = useState(null);
   const [tables, setTables] = useState([]);
-  const [seatTableID, setSeatTableID] = useState(null);
+  const [seatTable, setSeatTable] = useState(null);
 
   useEffect(() => {
-    const abortController = new AbortController();
-    setError(null);
-    listTables()
-    .then(setTables)
-    .catch(setError);
-    return () => abortController.abort();
+    async function loadTables() {
+      const c = new AbortController();
+      setError(null);
+      try {
+        const response = await listTables(c.signal);
+        setTables((prev) => response);
+      } catch (error) {
+        setError(error);
+      }
+      return () => c.abort();
+    }
+    loadTables();
   }, [reservation_id]);
 
-
-  async function handleSubmit(e){
-e.preventDefault()
-try {
-    const response = await seatReservationUpdate(seatTableID, reservation_id)
-    if (response) {
-      history.push(`/dashboard`);
-    }
-  } catch (error) {
-    setError(error);
-  }
-  }
-
-  const handleCancel = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
+    const c = new AbortController();
+    try {
+      const response = await seatReservation(
+        seatTable,
+        reservation_id,
+        c.signal
+      );
+      if (response) {
+        history.push(`/dashboard`);
+      }
+    } catch (error) {
+      setError(error);
+    }
+    return () => c.abort();
+  }
+
+  function handleCancel() {
     history.goBack();
-  };
+  }
 
   function handleSelectTable(e) {
-    setSeatTableID(e.target.value);
+    setSeatTable(e.target.value);
   }
 
   const options = tables.map((table) => (
@@ -50,10 +59,11 @@ try {
   ));
 
   return (
-    <div>
-      <h3>Choose table for reservation</h3>
-      <ErrorAlert error={error}/>
-      <br/>
+    <>
+      <div className="d-flex justify-content-center pt-3">
+        <h3>Select Table for Reservation</h3>
+      </div>
+      <ErrorAlert error={error} />
       <form onSubmit={handleSubmit} className="d-flex justify-content-center">
         <label htmlFor="seat_reservation">
           Seat at:
@@ -75,8 +85,6 @@ try {
           Cancel
         </button>
       </form>
-    </div>
+    </>
   );
 }
-
-export default Seat;

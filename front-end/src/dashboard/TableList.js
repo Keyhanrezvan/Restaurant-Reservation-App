@@ -1,35 +1,31 @@
 import React from "react";
-import TableData from "./TableData"
+import TableData from "./TableData";
 
-function TableList({tables, loadDash}){
-
+export default function TableList({ tables, loadDashboard }) {
   if (!tables) {
     return null;
   }
 
-    let bodyData = tables.map((table) => {
-        return (
-            <TableData key={table.table_id} table={table} loadDashboard={loadDash}/>
-        )
-        })
-
+  const formatted = tables.map((table) => {
     return (
-      <div className="table table-sm">
-        <table>
-          <thead>
-            <tr>
-              <th>Table Name</th>
-              <th>Capacity</th>
-              <th>Status</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-          {bodyData}
-          </tbody>
-        </table>
-      </div>
+      <TableData key={table.table_id} table={table} loadDashboard={loadDashboard} />
     );
-  }
+  });
 
-export default TableList
+  return (
+    <div>
+      <table className="table table-sm table-striped table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Table</th>
+            <th scope="col">Capacity</th>
+            <th scope="col">Status</th>
+            <th scope="col">Finish</th>
+          </tr>
+        </thead>
+        <tbody>{formatted}</tbody>
+      </table>
+    </div>
+  );
+}

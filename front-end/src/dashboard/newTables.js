@@ -1,70 +1,82 @@
-import React, { useState } from "react"
+import React, { useState } from "react";
 import { useHistory } from "react-router";
-import ErrorAlert from "../layout/ErrorAlert"
-import {createTable} from "../utils/api"
+import { createTable } from "../utils/api";
+import ErrorAlert from "../layout/ErrorAlert";
 
-function NewTables() {
+export default function Tables() {
+  const history = useHistory();
+  const initForm = { table_name: "", capacity: 0 };
+  const [tableError, setTableError] = useState(null);
+  const [tableForm, setTableForm] = useState({ ...initForm });
 
-  const history = useHistory()
-
-  const [tableInfo, setTableInfo]= useState({name:"", capacity:""})
-  const [error, setError] = useState(null)
-
-
-  const submitHandler=(e)=>{
-    e.preventDefault()
-    setError(null)
-    createTable({...tableInfo})
-    .then(()=>{
-      history.push("/dashboard")
-    })
-    .catch(setError)
+  function handleFormChange(e) {
+    setTableForm({
+      ...tableForm,
+      [e.target.name]: e.target.value,
+    });
   }
 
-  const changeHandler=({target})=>{
-target.name === "capacity" ? setTableInfo({...tableInfo, [target.name]:Number(target.value)}):
-setTableInfo({...tableInfo, [target.name]:(target.value)})
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const c = new AbortController();
+    try {
+      tableForm.capacity = Number(tableForm.capacity);
+      const response = await createTable(tableForm, c.signal);
+      if (response) {
+        history.push("/dashboard");
+      }
+    } catch (error) {
+      setTableError(error);
+    }
+    return () => c.abort();
   }
 
-  const cancelHandler=(e)=>{
-    e.preventDefault()
-    history.goBack()
+  function handleCancel() {
+    history.goBack();
   }
 
   return (
-    
-    <div className="tableCard">
-      <ErrorAlert error={error}/>
-      <form onSubmit={submitHandler}>
-        <div className="formGroup">
-          <label>Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={tableInfo.name}
-            onChange={changeHandler}
-            placeholder="Table Name"
-          />
+    <>
+      <div className="d-flex justify-content-center pt-3">
+        <h3>Create a New Table</h3>
+      </div>
+      <ErrorAlert error={tableError} />
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="table_name"
+          className="form-control mb-1"
+          id="table_name"
+          placeholder="Table"
+          value={tableForm.table_name}
+          onChange={handleFormChange}
+          minLength={2}
+          required
+        />
+        <input
+          type="number"
+          name="capacity"
+          className="form-control mb-1"
+          id="capacity"
+          placeholder="Number of guests"
+          value={tableForm.capacity}
+          onChange={handleFormChange}
+          min="1"
+          required
+        />
+        <div className="d-flex justify-content-center">
+          <button type="submit" className="btn btn-primary mr-1">
+            Submit
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
         </div>
-        <div className="formGroup">
-          <label>Capacity</label>
-          <input
-            type="Number"
-            id="capacity"
-            name="capacity"
-            value={tableInfo.capacity}
-            onChange={changeHandler}
-            placeholder="Capacity"
-            min="1"
-            required
-          />
-        </div>
-        </form>
-        <button className="cancelButton" type="submit">Submit</button>
-        <button onClick={cancelHandler}>Cancel</button>
-    </div>
-  )
+      </form>
+    </>
+  );
 }
-
-export default NewTables;
