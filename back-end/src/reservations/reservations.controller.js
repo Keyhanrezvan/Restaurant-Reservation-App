@@ -64,7 +64,7 @@ function isValidReservation(req, res, next) {
 function isNotOnTuesday(req, res, next) {
   const { reservation_date } = req.body.data;
   const [year, month, day] = reservation_date.split("-");
-  const date = new Date(`${month} ${day}, ${year}`);
+  const date = new Date(`${month}, ${day}, ${year}`);
   res.locals.date = date;
   if (date.getDay() === 2) {
     return next({ status: 400, message: "Location is closed on Tuesdays" });
@@ -225,8 +225,8 @@ module.exports = {
   list: [mobileNumberSeachValidation, asyncErrorBoundary(list)],
   create: [
     asyncErrorBoundary(isValidReservation),
-    isNotOnTuesday,
     mobileNumberValidation,
+    isNotOnTuesday,
     isInTheFuture,
     isWithinOpenHours,
     hasBookedStatus,
@@ -241,9 +241,9 @@ module.exports = {
   ],
   modify: [
     isValidReservation,
+    mobileNumberValidation,
     isNotOnTuesday,
     isInTheFuture,
-    mobileNumberValidation,
     isWithinOpenHours,
     asyncErrorBoundary(reservationExists),
     hasBookedStatus,
