@@ -146,6 +146,40 @@ const reservationExists = async (req, res, next) => {
   });
 };
 
+function mobileNumberValidation(req, res, next) {
+  const { data } = req.body;
+  const mobile_number = data.mobile_number;
+  if (!/^[0-9 -]+$/.test(mobile_number)) {
+    return next({
+      status: 400,
+      message: "phone number can only contain numbers",
+    });
+  }
+  next();
+}
+
+function mobileNumberSeachValidation(req, res, next) {
+  const { mobile_number } = req.query;
+  const { date } = req.query;
+
+  if (date) {
+    next();
+    return;
+  }
+
+  if (!mobile_number) {
+    next();
+    return; 
+  }
+
+  if (!/^[0-9 -]+$/.test(mobile_number)) {
+    return next({
+      status: 400,
+      message: "search can only contain numbers",
+    });
+  }
+  next();
+} 
 
 async function list(req, res) {
   const { date, mobile_number } = req.query;
@@ -188,10 +222,11 @@ async function modify(req, res, next) {
 }
 
 module.exports = {
-  list: asyncErrorBoundary(list),
+  list: [mobileNumberSeachValidation, asyncErrorBoundary(list)],
   create: [
     asyncErrorBoundary(isValidReservation),
     isNotOnTuesday,
+    mobileNumberValidation,
     isInTheFuture,
     isWithinOpenHours,
     hasBookedStatus,
@@ -208,6 +243,7 @@ module.exports = {
     isValidReservation,
     isNotOnTuesday,
     isInTheFuture,
+    mobileNumberValidation,
     isWithinOpenHours,
     asyncErrorBoundary(reservationExists),
     hasBookedStatus,
