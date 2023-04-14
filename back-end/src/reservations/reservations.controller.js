@@ -1,6 +1,4 @@
-/**
- * List handler for reservation resources
- */
+
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const service = require("./reservations.service");
 
@@ -13,7 +11,7 @@ const VALID_RESERVATION_FIELDS = [
   "people",
 ];
 
-//helper function for validation
+
 function _validateTime(str) {
   const [hour, minute] = str.split(":");
 
@@ -29,7 +27,7 @@ function _validateTime(str) {
   return true;
 }
 
-//validation middleware
+
 function isValidReservation(req, res, next) {
   const reservation = req.body.data;
 
@@ -148,7 +146,7 @@ const reservationExists = async (req, res, next) => {
   });
 };
 
-//CRUD
+
 async function list(req, res) {
   const { date, mobile_number } = req.query;
   let reservations;
