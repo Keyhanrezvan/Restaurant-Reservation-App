@@ -160,7 +160,7 @@ function mobileNumberValidation(req, res, next) {
 
 function mobileNumberSeachValidation(req, res, next) {
   const { mobile_number } = req.query;
-  const { date } = req.query;
+  const { date } = req.query
 
   if (date) {
     next();
